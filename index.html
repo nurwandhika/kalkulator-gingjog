@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kalkulator Saham Gingjog Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+    <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+      window.GoogleGenerativeAI = GoogleGenerativeAI;
+    </script>
     <style>
       body {
         font-family: system-ui, -apple-system, sans-serif;
@@ -98,88 +110,73 @@
         class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6 border border-gray-100"
       >
         <div class="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
-          <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3"
-          >
-            <h3
-              class="font-bold text-blue-900 flex items-center gap-2 text-sm uppercase tracking-wide"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+              <h3
+                class="font-bold text-blue-900 flex items-center gap-2 text-sm uppercase tracking-wide"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Pengaturan Transaksi
-            </h3>
-            <div
-              class="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-blue-100 shadow-sm"
-            >
-              <input
-                type="checkbox"
-                id="isAccel"
-                class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-              />
-              <label
-                for="isAccel"
-                class="text-xs text-gray-700 font-medium cursor-pointer select-none"
-                >Saham Akselerasi (Tick Rp1)</label
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Market Rules
+              </h3>
+              <div
+                class="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-blue-200 shadow-sm"
               >
+                <input
+                  type="checkbox"
+                  id="isAccel"
+                  class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label
+                  for="isAccel"
+                  class="text-xs text-gray-700 font-medium cursor-pointer select-none"
+                  >Saham Akselerasi</label
+                >
+              </div>
             </div>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs md:text-sm">
-            <div>
-              <label class="block text-gray-500 mb-1">Fee Beli (%)</label>
-              <input
-                type="number"
-                id="feeBuy"
-                value="0.15"
-                step="0.01"
-                class="w-full px-3 py-1.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-center font-medium"
-              />
-            </div>
-            <div>
-              <label class="block text-gray-500 mb-1">Fee Jual (%)</label>
-              <input
-                type="number"
-                id="feeSell"
-                value="0.25"
-                step="0.01"
-                class="w-full px-3 py-1.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-center font-medium"
-              />
-            </div>
-            <div>
-              <label class="block text-gray-500 mb-1">Tick Size</label>
-              <input
-                type="text"
-                id="displayTick"
-                disabled
-                value="Auto"
-                class="w-full px-3 py-1.5 border border-transparent rounded-lg bg-blue-100 text-blue-800 font-bold text-center"
-              />
-            </div>
-            <div>
-              <label class="block text-gray-500 mb-1">Batas ARA</label>
-              <input
-                type="text"
-                id="displayARA"
-                disabled
-                value="-"
-                class="w-full px-3 py-1.5 border border-transparent rounded-lg bg-green-100 text-green-800 font-bold text-center"
-              />
+
+            <div class="flex gap-2 text-xs md:text-sm">
+              <div
+                class="flex items-center gap-2 bg-blue-100 px-3 py-1.5 rounded-lg text-blue-800 font-medium"
+              >
+                <span>Tick:</span>
+                <input
+                  type="text"
+                  id="displayTick"
+                  disabled
+                  value="Auto"
+                  class="bg-transparent w-12 font-bold text-center outline-none"
+                />
+              </div>
+              <div
+                class="flex items-center gap-2 bg-green-100 px-3 py-1.5 rounded-lg text-green-800 font-medium"
+              >
+                <span>ARA:</span>
+                <input
+                  type="text"
+                  id="displayARA"
+                  disabled
+                  value="-"
+                  class="bg-transparent w-20 font-bold text-center outline-none"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -403,9 +400,9 @@
       <div id="historySection" class="space-y-4"></div>
 
       <footer class="mt-12 text-center text-sm text-gray-500 pb-4">
-        <p>Dilengkapi Rumus BEP, Net Profit & IDX Auto Rejection</p>
         <p class="mt-1">
-          Powered by <span class="font-bold text-blue-600">Nurwan</span>
+          This app written by
+          <span class="font-bold text-blue-600">Nurwan</span>
         </p>
       </footer>
     </div>
@@ -488,24 +485,27 @@
             >
               <p class="mb-2 font-medium text-blue-900">
                 Data wajib diambil dari Running Trade / Orderbook aplikasi
-                sekuritas Anda:
+                sekuritas Anda saat market berjalan:
               </p>
-              <ul class="list-disc list-inside space-y-1 ml-1">
+              <ul class="list-disc list-inside space-y-1.5 ml-1">
                 <li>
-                  <b>Avg Price:</b> Harga rata-rata pembelian saham Anda saat
-                  ini.
+                  <b class="text-gray-800">Avg Price:</b> Harga rata-rata
+                  pembelian saham Anda saat ini.
                 </li>
                 <li>
-                  <b>Bid Terendah (Support):</b> Harga antrian beli paling bawah
-                  (Support Intraday).
+                  <b class="text-gray-800">Bid Terendah (Support):</b> Harga
+                  antrian beli paling bawah. Ini berfungsi sebagai Support
+                  Intraday.
                 </li>
                 <li>
-                  <b>Offer Tertinggi (Resist):</b> Harga antrian jual paling
-                  atas (Resistance Intraday).
+                  <b class="text-gray-800">Offer Tertinggi (Resist):</b> Harga
+                  antrian jual paling atas. Ini berfungsi sebagai Resistance
+                  Intraday.
                 </li>
                 <li>
-                  <b>Total Bid/Offer:</b> Jumlah total lot antrian di sisi kiri
-                  (Bid) dan kanan (Offer).
+                  <b class="text-gray-800">Total Bid/Offer:</b> Jumlah total lot
+                  antrian di sisi kiri (Bid) dan kanan (Offer) untuk mengukur
+                  tekanan pasar.
                 </li>
               </ul>
             </div>
@@ -534,30 +534,34 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div
-                class="border border-green-200 bg-green-50/50 p-4 rounded-xl hover:bg-green-50 transition-colors"
+                class="border border-green-200 bg-green-50/50 p-4 rounded-xl hover:bg-green-50 transition-colors shadow-sm"
               >
                 <span
-                  class="font-bold text-green-700 flex items-center gap-2 mb-2"
+                  class="font-bold text-green-700 flex items-center gap-2 mb-2 text-base"
                 >
-                  <span class="w-2 h-2 bg-green-500 rounded-full"></span> Target
-                  Konservatif
+                  <span
+                    class="w-2.5 h-2.5 bg-green-500 rounded-full ring-2 ring-green-200"
+                  ></span>
+                  Target Konservatif
                 </span>
-                <p>
+                <p class="leading-relaxed">
                   Target jual aman untuk <b>Scalping Cepat</b> (Hit & Run).
                   Gunakan target ini jika market terlihat ragu-ragu atau
                   sideway.
                 </p>
               </div>
               <div
-                class="border border-blue-200 bg-blue-50/50 p-4 rounded-xl hover:bg-blue-50 transition-colors"
+                class="border border-blue-200 bg-blue-50/50 p-4 rounded-xl hover:bg-blue-50 transition-colors shadow-sm"
               >
                 <span
-                  class="font-bold text-blue-700 flex items-center gap-2 mb-2"
+                  class="font-bold text-blue-700 flex items-center gap-2 mb-2 text-base"
                 >
-                  <span class="w-2 h-2 bg-blue-500 rounded-full"></span> Target
-                  Optimis
+                  <span
+                    class="w-2.5 h-2.5 bg-blue-500 rounded-full ring-2 ring-blue-200"
+                  ></span>
+                  Target Optimis
                 </span>
-                <p>
+                <p class="leading-relaxed">
                   Target maksimal berdasarkan tekanan beli (Bandarmology).
                   Gunakan untuk <b>Day Trading</b> saat volume tinggi.
                 </p>
@@ -586,32 +590,75 @@
               </div>
               <h4 class="font-bold text-lg">3. Fitur Penting Lainnya</h4>
             </div>
-            <dl class="space-y-3 text-sm divide-y divide-gray-100">
-              <div class="pt-2 flex gap-3">
-                <dt class="font-bold text-gray-800 min-w-[120px]">
-                  Net Profit:
+            <dl class="space-y-4 text-sm divide-y divide-gray-100">
+              <!-- <div class="pt-2 flex flex-col sm:flex-row gap-1 sm:gap-3">
+                 <dt
+                  class="font-bold text-gray-800 min-w-[130px] flex items-center gap-1"
+                >
+                  <svg
+                    class="w-4 h-4 text-green-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Floating Profit
+                </dt> 
+              </div>-->
+              <div class="pt-2 flex flex-col sm:flex-row gap-1 sm:gap-3">
+                <dt
+                  class="font-bold text-gray-800 min-w-[130px] flex items-center gap-1"
+                >
+                  <svg
+                    class="w-4 h-4 text-yellow-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                  ARA CAP
                 </dt>
-                <dd>
-                  Kalkulator ini otomatis memotong <b>Fee Beli & Jual</b>.
-                  Profit yang tampil adalah uang bersih yang masuk ke RDN Anda.
-                </dd>
-              </div>
-              <div class="pt-2 flex gap-3">
-                <dt class="font-bold text-gray-800 min-w-[120px]">ARA CAP:</dt>
-                <dd>
+                <dd class="text-gray-600">
                   Jika muncul label
                   <span
-                    class="bg-yellow-200 text-yellow-800 px-1 rounded text-xs font-bold mx-1"
+                    class="bg-yellow-200 text-yellow-800 px-1.5 py-0.5 rounded text-xs font-bold mx-1"
                     >ARA CAP</span
                   >, artinya target hitungan melebihi batas Auto Rejection Atas
                   hari ini, sehingga target disesuaikan ke harga ARA.
                 </dd>
               </div>
-              <div class="pt-2 flex gap-3">
-                <dt class="font-bold text-gray-800 min-w-[120px]">
-                  Saham Akselerasi:
+              <div class="pt-2 flex flex-col sm:flex-row gap-1 sm:gap-3">
+                <dt
+                  class="font-bold text-gray-800 min-w-[130px] flex items-center gap-1"
+                >
+                  <svg
+                    class="w-4 h-4 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                  Saham Akselerasi
                 </dt>
-                <dd>
+                <dd class="text-gray-600">
                   Centang opsi ini di menu pengaturan (atas) jika saham yang
                   Anda analisa berada di Papan Akselerasi (Tick Rp 1, ARA 10%).
                 </dd>
@@ -1800,13 +1847,13 @@
         };
       }
 
-      function calculateBEP(buyPrice, feeBuyPct, feeSellPct, isAccel) {
-        const buyWithFee = buyPrice * (1 + feeBuyPct / 100);
-        const rawBEP = buyWithFee / (1 - feeSellPct / 100);
-        const tick = getTickSize(rawBEP, isAccel);
-        let bep = Math.ceil(rawBEP / tick) * tick;
-        return bep;
-      }
+      // function calculateBEP(buyPrice, feeBuyPct, feeSellPct, isAccel) {
+      //   const buyWithFee = buyPrice * (1 + feeBuyPct / 100);
+      //   const rawBEP = buyWithFee / (1 - feeSellPct / 100);
+      //   const tick = getTickSize(rawBEP, isAccel);
+      //   let bep = Math.ceil(rawBEP / tick) * tick;
+      //   return bep;
+      // }
 
       // === 4. Main Logic ===
       document.addEventListener("DOMContentLoaded", () => {
@@ -1852,8 +1899,173 @@
         }
       }
 
+      // === 4. REAL GEMINI API INTEGRATION (HARDCODED KEY) ===
+
+      async function fetchGeminiAnalysis(data, inputs) {
+        // --- GANTI TEKS DI BAWAH INI DENGAN API KEY ANDA ---
+        const apiKey = CONFIG.GEMINI_API_KEY;
+        // ----------------------------------------------------
+
+        try {
+          // Inisialisasi SDK
+          const genAI = new window.GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash-lite",
+          });
+
+          // Prompt Engineering Context
+          // Prompt Engineering Context (YANG BARU)
+          // Prompt Engineering Context (HTML MODE)
+          const prompt = `
+            Bertindaklah sebagai Quantitative Trader & Pakar Bandarmology Senior.
+            Analisa data saham ${inputs.emiten} (${
+            inputs.isAccel ? "Papan Akselerasi" : "Papan Utama"
+          }) ini.
+
+            DATA INPUT:
+            - Entry Price: Rp ${data.buyAvg}
+            - Target High: Rp ${
+              data.targetHigh
+            } (Floating Profit Est: ${formatNumber(data.profitHigh.pct, 2)}%)
+            - Support (Bid Low): ${data.bidLow}
+            - Resistance (Offer High): ${data.offerHigh}
+            - Volume Bid (Buyer): ${data.totalBid} lot
+            - Volume Offer (Seller): ${data.totalOffer} lot
+            - Tekanan Beli (Pressure): Mampu memakan ${formatNumber(
+              data.papanCountHigh,
+              1
+            )} papan antrian.
+            
+            TUGAS: Berikan output dalam format HTML sederhana (tanpa markdown block, langsung tag HTML).
+            Gunakan struktur berikut:
+
+            <div class="space-y-2 text-sm">
+                <div>
+                    <b>📊 SENTIMEN PASAR:</b>
+                    <ul class="list-disc list-inside pl-1 text-gray-700">
+                        <li>Hitung Rasio Volume (Bid/Offer) dan berikan komentar singkat (Dominasi Buyer/Seller).</li>
+                        <li>Jelaskan arti Tekanan Beli ${formatNumber(
+                          data.papanCountHigh,
+                          1
+                        )} papan secara singkat.</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <b>⚖️ RISK vs REWARD:</b>
+                    <ul class="list-disc list-inside pl-1 text-gray-700">
+                         <li>Evaluasi apakah Profit ${formatNumber(
+                           data.profitHigh.pct,
+                           2
+                         )}% sepadan dengan risiko.</li>
+                         <li>Status Risiko: ${
+                           data.hitARA ? "Mentok ARA" : "Normal"
+                         } / ${data.slInfo ? "SL Terpasang" : "Tanpa SL"}.</li>
+                    </ul>
+                </div>
+
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                    <b>🚀 KESIMPULAN:</b> <span class="font-bold text-blue-700">[COMMAND]</span>
+                    <br>
+                    <span class="text-xs text-gray-500">Saran: Berikan rentang harga jual/stoploss ideal.</span>
+                </div>
+            </div>
+
+            Ganti [COMMAND] dengan salah satu: HAKA SEKARANG, ANTRI BAWAH, atau JANGAN MASUK.
+            JANGAN gunakan tanda bintang (*) untuk bold, gunakan tag <b> atau <strong>.
+            `;
+
+          // INI BENAR
+          const result = await model.generateContent(prompt); // Panggil dari 'model', simpan ke 'result'
+          const response = await result.response;
+          let text = response.text();
+
+          // Cleaning Markdown (Hapus ```html dan ``` di awal/akhir jika ada)
+          text = text
+            .replace(/```html/g, "")
+            .replace(/```/g, "")
+            .trim();
+
+          // Sentiment Analysis Sederhana untuk Styling Border & Title
+          let cssClass = "bg-blue-50 border-blue-200 text-blue-800";
+          let iconPath =
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+
+          // Cek keyword di dalam raw text untuk menentukan warna
+          const lowerText = text.toLowerCase();
+          if (
+            lowerText.includes("haka") ||
+            lowerText.includes("strong") ||
+            lowerText.includes("dominasi buyer")
+          ) {
+            cssClass = "bg-green-50 border-green-200 text-green-800";
+            iconPath =
+              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+          } else if (
+            lowerText.includes("jangan masuk") ||
+            lowerText.includes("high risk") ||
+            lowerText.includes("tekanan jual")
+          ) {
+            cssClass = "bg-red-50 border-red-200 text-red-800";
+            iconPath =
+              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>';
+          }
+
+          return {
+            title: "Analisa Cerdas", // Title generik, detail ada di body HTML
+            desc: text, // Ini sekarang berisi HTML string
+            css: cssClass,
+            icon: iconPath,
+          };
+
+          return {
+            title: "Analisa Gemini AI",
+            desc: text,
+            css: cssClass,
+            icon: iconPath,
+          };
+        } catch (error) {
+          console.error("Gemini Error:", error);
+          return {
+            title: "AI Sedang Sibuk",
+            desc:
+              "Gagal mengambil analisa (Error: " +
+              error.message +
+              "). Coba lagi nanti.",
+            css: "bg-gray-100 border-gray-300 text-gray-600",
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+          };
+        }
+      }
+
+      // === FUNGSI TRIGGER TOMBOL AI ===
+      async function triggerAI(id) {
+        // 1. Cari item di history
+        const index = history.findIndex((h) => h.id === id);
+        if (index === -1) return;
+        const item = history[index];
+
+        // 2. Ubah tombol jadi loading
+        const btnId = `btn-ai-${id}`;
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sedang Menganalisa...`;
+          btn.disabled = true;
+        }
+
+        // 3. Panggil Gemini (Gunakan 'item' sebagai data dan inputs karena strukturnya sudah merged)
+        const analysis = await fetchGeminiAnalysis(item, item);
+
+        // 4. Update History & Simpan
+        history[index].aiAnalysis = analysis;
+        localStorage.setItem("calc_pro_history", JSON.stringify(history));
+
+        // 5. Render ulang untuk menampilkan hasil
+        renderHistory();
+      }
+
       function handleCalculate() {
-        // 1. Get Inputs
+        // 1. Get Inputs (Tanpa Fee)
         const inputs = {
           date: document.getElementById("tanggal").value,
           emiten: document.getElementById("emiten").value.toUpperCase(),
@@ -1867,8 +2079,6 @@
           ),
           totalBid: parseFloat(document.getElementById("totalBid").value),
           totalOffer: parseFloat(document.getElementById("totalOffer").value),
-          feeBuy: parseFloat(document.getElementById("feeBuy").value),
-          feeSell: parseFloat(document.getElementById("feeSell").value),
           isAccel: document.getElementById("isAccel").checked,
         };
 
@@ -1883,7 +2093,9 @@
           isNaN(inputs.totalBid) ||
           isNaN(inputs.totalOffer)
         ) {
-          alert("Mohon lengkapi semua data yang bertanda (Wajib)");
+          alert(
+            "Mohon lengkapi data: Emiten, Broker, Avg Price, Lot, dan Orderbook."
+          );
           return;
         }
         if (inputs.offerHigh <= inputs.bidLow) {
@@ -1894,27 +2106,29 @@
         // 3. Core Calculation
         const tick = getTickSize(inputs.buyAvg, inputs.isAccel);
         const limits = getARA_ARB(inputs.buyAvg, inputs.isAccel);
-        const bep = calculateBEP(
-          inputs.buyAvg,
-          inputs.feeBuy,
-          inputs.feeSell,
-          inputs.isAccel
-        );
-        const totalCapital = inputs.buyAvg * inputs.buyLot * 100;
-        const feeBuyRp = totalCapital * (inputs.feeBuy / 100);
 
-        // Tape Reading Logic
+        // --- PERUBAHAN UTAMA DI SINI ---
+        // BEP sekarang SAMA DENGAN Avg Price (Karena ini view Broker Summary)
+        const bep = inputs.buyAvg;
+        // -------------------------------
+
+        // Tape Reading Logic (Bandarmology Basic)
+        // Menghitung seberapa kuat 'power' buyer memakan antrian offer
         const priceRange = inputs.offerHigh - inputs.bidLow;
         const jumlahPapan = priceRange / tick + 1;
         const rataPerPapan =
           (inputs.totalBid + inputs.totalOffer) / jumlahPapan;
+
+        // Pressure: Seberapa banyak lot ini bisa memakan papan (asumsi volume rata-rata)
         const papanCountHigh =
           rataPerPapan > 0 ? inputs.buyLot / rataPerPapan : 0;
-        const papanCountLow = papanCountHigh * 0.5;
-        const baseline = inputs.buyAvg * 0.05;
+
+        // Baseline Profit: Kita set target minimal 3% dari Avg Price Bandar
+        const baseline = inputs.buyAvg * 0.03;
 
         let rawTargetHigh = inputs.buyAvg + baseline + papanCountHigh * tick;
-        let rawTargetLow = inputs.buyAvg + baseline + papanCountLow * tick;
+        let rawTargetLow =
+          inputs.buyAvg + baseline + papanCountHigh * 0.5 * tick;
 
         let targetHigh = adjustToTick(rawTargetHigh, tick);
         let targetLow = adjustToTick(rawTargetLow, tick);
@@ -1923,24 +2137,24 @@
         if (targetHigh > limits.ara) targetHigh = limits.ara;
         if (targetLow > limits.ara) targetLow = limits.ara;
 
-        const calculateNet = (targetPrice) => {
-          const grossSell = targetPrice * inputs.buyLot * 100;
-          const feeSellRp = grossSell * (inputs.feeSell / 100);
-          const netProfitRp = grossSell - totalCapital - feeBuyRp - feeSellRp;
-          const netPercent = (netProfitRp / totalCapital) * 100;
-          return { rp: netProfitRp, pct: netPercent };
+        // --- RUMUS PROFIT BARU (GROSS / SELISIH HARGA SAJA) ---
+        const calculateFloating = (targetPrice) => {
+          const diff = targetPrice - inputs.buyAvg; // Selisih harga
+          const totalProfitRp = diff * inputs.buyLot * 100; // Total Rupiah
+          const totalProfitPct = (diff / inputs.buyAvg) * 100; // Persentase
+          return { rp: totalProfitRp, pct: totalProfitPct };
         };
 
-        const profitHigh = calculateNet(targetHigh);
-        const profitLow = calculateNet(targetLow);
+        const profitHigh = calculateFloating(targetHigh);
+        const profitLow = calculateFloating(targetLow);
 
         let slInfo = null;
         if (inputs.stopLoss > 0) {
-          const slNet = calculateNet(inputs.stopLoss);
-          slInfo = { price: inputs.stopLoss, rp: slNet.rp, pct: slNet.pct };
+          const slGross = calculateFloating(inputs.stopLoss);
+          slInfo = { price: inputs.stopLoss, rp: slGross.rp, pct: slGross.pct };
         }
 
-        // 4. Result Object
+        // 4. Result Object (AI Analysis Default Null)
         const result = {
           id: Date.now(),
           timestamp: new Date().toISOString(),
@@ -1958,6 +2172,7 @@
           slInfo,
           hitARA,
           baseline,
+          aiAnalysis: null,
         };
 
         saveToHistory(result);
@@ -1990,10 +2205,12 @@
 
       function renderHistory() {
         const container = document.getElementById("historySection");
+
         if (history.length === 0) {
           container.innerHTML = `<div class="text-center text-gray-400 py-10 bg-white rounded-xl border border-dashed border-gray-300">Belum ada riwayat analisa</div>`;
           return;
         }
+
         container.innerHTML = history
           .map((item) => {
             const isExp = expandedItems[item.id];
@@ -2003,6 +2220,41 @@
                 )} (${formatNumber(item.slInfo.pct, 2)}%)</span>`
               : `<span class="text-gray-400 italic">No SL</span>`;
 
+            // LOGIKA BARU: Tombol atau Hasil?
+            let aiSectionHTML = "";
+
+            if (item.aiAnalysis) {
+              // Jika SUDAH ada hasil (pernah diklik), tampilkan Card Hasil
+              aiSectionHTML = `
+                    <div class="mb-4 p-3 rounded-lg border ${item.aiAnalysis.css} flex gap-3 items-start shadow-sm bg-opacity-50 animate-fade-in">
+                        <div class="mt-1 shrink-0 opacity-80">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${item.aiAnalysis.icon}
+                            </svg>
+                        </div>
+                        <div class="w-full">
+                            <h5 class="font-bold text-sm mb-2 flex items-center gap-1 border-b border-black/10 pb-1">
+                                Gingjog AI Analysis
+                            </h5>
+                            <div class="text-xs opacity-90 leading-relaxed w-full space-y-1">
+                                ${item.aiAnalysis.desc}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+              // Jika BELUM ada hasil, tampilkan Tombol Request
+              aiSectionHTML = `
+                    <div class="mb-4">
+                        <button onclick="triggerAI(${item.id})" id="btn-ai-${item.id}" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold py-2.5 px-4 rounded-lg border border-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Minta Analisa AI
+                        </button>
+                    </div>
+                `;
+            }
+
+            // TEMPLATE UTAMA KARTU HISTORY
             return `
                 <div class="animate-fade-in bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <div class="p-5 border-b border-gray-100">
@@ -2029,17 +2281,21 @@
                             </div>
                             <button onclick="deleteItem(${
                               item.id
-                            })" class="text-gray-400 hover:text-red-500 transition-colors">
+                            })" class="text-gray-400 hover:text-red-500 transition-colors" title="Hapus Item">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
+                        ${aiSectionHTML}
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="bg-gray-50 rounded-lg p-3 flex flex-col justify-center text-sm">
-                                <div class="flex justify-between mb-1"><span class="text-gray-500">Break Even (BEP)</span><span class="font-bold text-gray-700">Rp ${formatNumber(
-                                  item.bep
-                                )}</span></div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-500">Avg Price</span> <span class="font-bold text-gray-700">Rp ${formatNumber(
+                                      item.bep
+                                    )}</span>
+                                </div>
                                 <div class="flex justify-between"><span class="text-gray-500">Risk Limit</span>${slDisplay}</div>
                             </div>
+
                             <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-lg p-3">
                                 <p class="text-xs text-green-700 font-semibold uppercase mb-1">Target Konservatif</p>
                                 <div class="flex items-baseline gap-2">
@@ -2051,10 +2307,11 @@
                                       2
                                     )}%</span>
                                 </div>
-                                <p class="text-xs text-green-600 mt-1">Net Profit: Rp ${formatNumber(
+                                <p class="text-xs text-green-600 mt-1">Floating: Rp ${formatNumber(
                                   item.profitLow.rp
                                 )}</p>
                             </div>
+
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-3 relative overflow-hidden">
                                 ${
                                   item.hitARA
@@ -2071,12 +2328,13 @@
                                       2
                                     )}%</span>
                                 </div>
-                                <p class="text-xs text-blue-600 mt-1">Net Profit: Rp ${formatNumber(
+                                <p class="text-xs text-blue-600 mt-1">Floating: Rp ${formatNumber(
                                   item.profitHigh.rp
                                 )}</p>
                             </div>
                         </div>
                     </div>
+                    
                     <button onclick="toggleExpand(${
                       item.id
                     })" class="w-full py-2 bg-gray-50 hover:bg-gray-100 text-xs text-gray-500 font-medium flex items-center justify-center gap-1 transition-colors border-t border-gray-100">
@@ -2089,6 +2347,7 @@
                           isExp ? "rotate-180" : ""
                         }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
+                    
                     <div class="${
                       isExp ? "block" : "hidden"
                     } bg-gray-50 p-5 text-sm border-t border-gray-200">
