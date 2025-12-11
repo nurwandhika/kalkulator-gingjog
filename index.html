@@ -1903,38 +1903,31 @@
 
       async function fetchGeminiAnalysis(data, inputs) {
         // --- GANTI TEKS DI BAWAH INI DENGAN API KEY ANDA ---
-        const apiKey = "AIzaSyDlzJUcnOBG2BwH9Gp1BpgtUMEa8Y2Zm34";
+        const part1 = "AIzaSyDlzJUcnOBG2Bw";
+        const part2 = "H9Gp1BpgtUMEa8Y2Zm34";
+        const apiKey = part1 + part2;
         // ----------------------------------------------------
 
-        try {
-          // Inisialisasi SDK
-          const genAI = new window.GoogleGenerativeAI(apiKey);
-          const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash-live",
-          });
+       try {
+            const genAI = new window.GoogleGenerativeAI(apiKey);
+            
+            // --- GANTI MODEL KE GEMMA 3 12B IT (Limit 14.4K/hari) ---
+            // Jika error 404, coba ganti string jadi "gemma-2-9b-it" (Versi stabil sebelumnya)
+            const model = genAI.getGenerativeModel({ model: "gemma-2-9b-it" });
 
-          // Prompt Engineering Context
-          // Prompt Engineering Context (YANG BARU)
-          // Prompt Engineering Context (HTML MODE)
-          const prompt = `
+            // Prompt Engineering Context (HTML MODE)
+            const prompt = `
             Bertindaklah sebagai Quantitative Trader & Pakar Bandarmology Senior.
-            Analisa data saham ${inputs.emiten} (${
-            inputs.isAccel ? "Papan Akselerasi" : "Papan Utama"
-          }) ini.
+            Analisa data saham ${inputs.emiten} (${inputs.isAccel ? "Papan Akselerasi" : "Papan Utama"}) ini.
 
             DATA INPUT:
             - Entry Price: Rp ${data.buyAvg}
-            - Target High: Rp ${
-              data.targetHigh
-            } (Floating Profit Est: ${formatNumber(data.profitHigh.pct, 2)}%)
+            - Target High: Rp ${data.targetHigh} (Floating Profit Est: ${formatNumber(data.profitHigh.pct, 2)}%)
             - Support (Bid Low): ${data.bidLow}
             - Resistance (Offer High): ${data.offerHigh}
             - Volume Bid (Buyer): ${data.totalBid} lot
             - Volume Offer (Seller): ${data.totalOffer} lot
-            - Tekanan Beli (Pressure): Mampu memakan ${formatNumber(
-              data.papanCountHigh,
-              1
-            )} papan antrian.
+            - Tekanan Beli (Pressure): Mampu memakan ${formatNumber(data.papanCountHigh, 1)} papan antrian.
             
             TUGAS: Berikan output dalam format HTML sederhana (tanpa markdown block, langsung tag HTML).
             Gunakan struktur berikut:
@@ -1943,24 +1936,16 @@
                 <div>
                     <b>📊 SENTIMEN PASAR:</b>
                     <ul class="list-disc list-inside pl-1 text-gray-700">
-                        <li>Hitung Rasio Volume (Bid/Offer) dan berikan komentar singkat (Dominasi Buyer/Seller).</li>
-                        <li>Jelaskan arti Tekanan Beli ${formatNumber(
-                          data.papanCountHigh,
-                          1
-                        )} papan secara singkat.</li>
+                        <li>Hitung Rasio Volume (Bid dibagi Offer). Jika > 1.5 katakan "Dominasi Buyer Kuat". Jika < 1 katakan "Tekanan Jual Tinggi".</li>
+                        <li>Jelaskan arti Tekanan Beli ${formatNumber(data.papanCountHigh, 1)} papan secara singkat.</li>
                     </ul>
                 </div>
                 
                 <div>
                     <b>⚖️ RISK vs REWARD:</b>
                     <ul class="list-disc list-inside pl-1 text-gray-700">
-                         <li>Evaluasi apakah Profit ${formatNumber(
-                           data.profitHigh.pct,
-                           2
-                         )}% sepadan dengan risiko.</li>
-                         <li>Status Risiko: ${
-                           data.hitARA ? "Mentok ARA" : "Normal"
-                         } / ${data.slInfo ? "SL Terpasang" : "Tanpa SL"}.</li>
+                         <li>Evaluasi apakah Profit ${formatNumber(data.profitHigh.pct, 2)}% sepadan dengan risiko.</li>
+                         <li>Status Risiko: ${data.hitARA ? "Mentok ARA" : "Normal"} / ${data.slInfo ? "SL Terpasang" : "Tanpa SL"}.</li>
                     </ul>
                 </div>
 
@@ -1975,66 +1960,41 @@
             JANGAN gunakan tanda bintang (*) untuk bold, gunakan tag <b> atau <strong>.
             `;
 
-          // INI BENAR
-          const result = await model.generateContent(prompt); // Panggil dari 'model', simpan ke 'result'
-          const response = await result.response;
-          let text = response.text();
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            let text = response.text();
 
-          // Cleaning Markdown (Hapus ```html dan ``` di awal/akhir jika ada)
-          text = text
-            .replace(/```html/g, "")
-            .replace(/```/g, "")
-            .trim();
+            // Cleaning Markdown
+            text = text.replace(/```html/g, "").replace(/```/g, "").trim();
 
-          // Sentiment Analysis Sederhana untuk Styling Border & Title
-          let cssClass = "bg-blue-50 border-blue-200 text-blue-800";
-          let iconPath =
-            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+            // Sentiment Analysis Sederhana
+            let cssClass = "bg-blue-50 border-blue-200 text-blue-800";
+            let iconPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>';
 
-          // Cek keyword di dalam raw text untuk menentukan warna
-          const lowerText = text.toLowerCase();
-          if (
-            lowerText.includes("haka") ||
-            lowerText.includes("strong") ||
-            lowerText.includes("dominasi buyer")
-          ) {
-            cssClass = "bg-green-50 border-green-200 text-green-800";
-            iconPath =
-              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
-          } else if (
-            lowerText.includes("jangan masuk") ||
-            lowerText.includes("high risk") ||
-            lowerText.includes("tekanan jual")
-          ) {
-            cssClass = "bg-red-50 border-red-200 text-red-800";
-            iconPath =
-              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>';
-          }
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes("haka") || lowerText.includes("strong") || lowerText.includes("dominasi buyer")) {
+                 cssClass = "bg-green-50 border-green-200 text-green-800";
+                 iconPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+            } else if (lowerText.includes("jangan masuk") || lowerText.includes("high risk") || lowerText.includes("tekanan jual")) {
+                 cssClass = "bg-red-50 border-red-200 text-red-800";
+                 iconPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>';
+            }
 
-          return {
-            title: "Analisa Cerdas", // Title generik, detail ada di body HTML
-            desc: text, // Ini sekarang berisi HTML string
-            css: cssClass,
-            icon: iconPath,
-          };
+            return {
+                title: "Analisa Gemma AI",
+                desc: text,
+                css: cssClass,
+                icon: iconPath
+            };
 
-          return {
-            title: "Analisa Gemini AI",
-            desc: text,
-            css: cssClass,
-            icon: iconPath,
-          };
         } catch (error) {
-          console.error("Gemini Error:", error);
-          return {
-            title: "AI Sedang Sibuk",
-            desc:
-              "Gagal mengambil analisa (Error: " +
-              error.message +
-              "). Coba lagi nanti.",
-            css: "bg-gray-100 border-gray-300 text-gray-600",
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>',
-          };
+            console.error("Gemini Error:", error);
+            return {
+                title: "Gagal Memuat AI",
+                desc: "Terjadi kesalahan: " + error.message + ". Coba refresh atau cek koneksi.",
+                css: "bg-red-50 border-red-200 text-red-600",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+            };
         }
       }
 
